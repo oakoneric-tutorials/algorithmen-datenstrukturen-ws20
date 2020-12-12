@@ -92,7 +92,8 @@
 	\pause
 	\begin{lstlisting}[style=notebook]
 	typedef struct node *tree;
-	struct node { int key; tree left, right; };
+	struct node { int key; tree left, right; };
+
 	\end{lstlisting}
 \end{frame}
 
@@ -196,7 +197,7 @@
 \end{frame}
 \begin{frame}[fragile] \frametitle{Teil (c) --- Produkt der Blätter}
 	\begin{itemize}
-		\item leerer Baum: \texttt{leafprod = 0}
+		\item leerer Baum: \texttt{leafprod = 1}
 		\item Rekursion: berechne \texttt{leafprod} in linkem und rechtem Teilbaum
 	\end{itemize}
 	\pause
