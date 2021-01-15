@@ -22,6 +22,8 @@
 \renewcommand{\tabularxcolumn}[1]{>{\hspace{0pt}}m{#1}}
 \usepackage{multirow}
 
+\usepackage{tikz}
+\usetikzlibrary{positioning}
 \usepackage{cancel}
 
 \usepackage{empheq}
@@ -71,256 +73,19 @@
 
 \begin{document}	
 	\title{Algorithmen und Datenstrukturen}
-	\subtitle{Übung 10: Suchen \& Korrigieren, AVL-Bäume}
+	\subtitle{Übung 10: AVL-Bäume \& Topologisches Sortieren}
 	\author{Eric Kunze}
 	\email{eric.kunze@mailbox.tu-dresden.de}
 	\city{TU Dresden}
 %	\institute{Lehrstuhl für Grundlagen der Programmierung}
 	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
-	\date{09.01.2020}
+	\date{15.01.2021}
 
 	\maketitle
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame} \frametitle{Algorithmen und Datenstrukturen}
-	\textbf{Was bisher geschah ...}
-	\begin{itemize}
-		\item Syntax von Programmiersprachen \\
-		 (Syntaxdiagramme, EBNF, Fixpunktsemantik)
-		\item Programmieren in $C$ -- Arrays, Pointer, Listen, Bäume
-		\item grundlegende Algorithmen in der Informatik
-		\begin{itemize}
-			\item Sortieren mit Quicksort und Heapsort
-			\item Suchen in Texten (KMP-Algorithmus)
-		\end{itemize}		
-	\end{itemize}
-
-	\pause
-
-	\textbf{Was heute geschieht ...}
-	\begin{itemize}
-		\item Wiederholung: Suche mit dem KMP-Algorithmus
-		\item Fehlerkorrektur mit der Levenshtein-Distanz
-		\item Balancieren von Bäumen (AVL-Bäume)
-	\end{itemize}
-\end{frame}
-
-
-\section{KMP-Algorithmus} 
-
-\begin{frame} \frametitle{KMP-Algorithmus --- Die Zwei-Finger-Methode}
-	Die Methode beruht auf der Gleichung
-	\begin{equation*}
-		\begin{aligned}
-		\small
-		&\texttt{Tab[i]} \\
-		= &\max \menge{-1} \cup \menge{m \mid 0 \le m \le i-1 \land b_0 \dots b_{m-i} = b_{i-m} \land b_{i-1} \land b_m \neq b_j}
-		\end{aligned} \tag{$\star$} \label{eq: kmp}
-	\end{equation*}
-	Daraus ergibt sich nach Initialisierung von $\texttt{Tab[0]} = -1$ für jeden folgenden Eintrag $\texttt{Tab[i]}$ folgendes Verfahren:
-	\begin{itemize}
-		\item \textit{linker Finger}: wähle $m < i$ in absteigender Reihenfolge (also $i-1$, $i-2$, $\dots$), sodass $\texttt{Pat[i]} \neq \texttt{Pat[m]}$
-		\item \textit{Parallelverschiebung beider Finger bis zum linken Rand}: wenn $\texttt{Pat[0 \dots m-1]} = \texttt{Pat[i-m \dots i-1]}$, dann fülle $\texttt{Tab[i]} = m$.
-		\item wenn keine passende Position $m$ gefunden werden kann, dann fülle $\texttt{Tab[i]} = -1$.
-	\end{itemize}
-\end{frame}
-
-
-\begin{frame} \frametitle{Aufgabe 1}
-	\textbf{Teil (a)} \hspace{3em}
-	Pattern: {\large \texttt{abbabbaa}} \\[1em]
-	\pause
-	
-	\begin{center}
-		\begin{tabular}{l|cccccccc}
-			Position &  0 &  1 &  2 &  3 &  4 &  5 &  6 &  7  \\ \hline
-			Pattern  &  a &  b &  b &  a &  b &  b &  a &  a  \\ \hline
-			Tabelle  & -1 &  0 &  0 & -1 &  0 &  0 & -1 &  4  \\
-		\end{tabular}
-	\end{center}
-	
-	\pause
-
-	\textbf{Teil (b)}
-	\begin{center}
-		\begin{tabular}{l|cccccc}
-			Position &  0 &  1 &  2 &  3 &  4 &  5 \\ \hline
-			Pattern  &  \textit{b} &  \onslide+<4->{a} &  \onslide+<4->{b} &  \onslide+<4->{a} &  \onslide+<4->{b} &  \textit{c} \\ \hline
-			Tabelle  & -1 &  ? & ? &  0 &  ? &  3 \\
-		\end{tabular}
-	\end{center}
-
-	\pause
-
-	\footnotesize
-	\begin{itemize}
-		\item $\texttt{Pat[0 ... 2] = Pat[2 ... 4]}$ wegen $\texttt{Tab[5] = 3}$ (Zyklenmethode), d.h. $\texttt{Pat[2] = Pat[0] = Pat[4] = b}$
-		\item wegen $\texttt{Tab[3] = 0}$ ist $\texttt{Pat[3]} \neq  \texttt{Pat[0] = b}$ und wegen $\texttt{Tab[5] = 3}$ ist $\texttt{Pat[3]} \neq \texttt{Pat[5] = c}$ (Zwei-Finger-Methode bzw. Gleichung \eqref{eq: kmp}) \\
-		$\Rightarrow \texttt{Pat[3] = Pat[1] = a}$
-	\end{itemize}
-	
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Levenshtein-Distanz}
-
-\begin{frame} \frametitle{Levenshtein-Distanz}
-	\textbf{Kosten} zur Überführung eines Wortes $w = w_1 \dots w_n$ in ein Wort $v = v_1 \dots v_k$ ; schreibe $d(w_1 \dots w_j, v_1 \dots v_i) = d(j,i)$.
-	\pause
-	\begin{align*}
-		d(0,i) &= i \\
-		d(j,0) &= j \\
-		d(j,i) &= \min \menge{ d(j,i-1) + 1, d(j-1,i) + 1 , d(j-1, i-1) + \delta_{j,i}}
-	\end{align*}
-	für alle $1 \le j \le n$ und alle $1 \le i \le k$ wobei
-	\begin{equation*}
-		\delta_{j,i} = \begin{cases}
-		1 & \text{wenn } w_j \neq v_i \\
-		0 & \text{sonst}
-		\end{cases} 
-	\end{equation*}
-	\pause
-	\textbf{Anschaulich:} 
-	Überlagerung durch Pattern
-	$\to$ Pfeile zeigen ''Ursprung`` des Minimums an
-	\begin{equation*}
-		w_j \neq v_i : \quad \begin{array}{|c|c|}
-			\hline +1 & +1 \\ \hline +1 & ? \\ \hline
-		\end{array}
-		\qquad \qquad
-		w_j = v_i : \quad 
-		\begin{array}{|c|c|}
-		\hline +0 & +1 \\ \hline +1 & ? \\ \hline
-		\end{array}
-	\end{equation*}
-
-\end{frame}
-\begin{frame} \frametitle{Aufgabe 9.4}
-		\centering
-		\renewcommand*{\arraystretch}{.7}
-		\setlength{\tabcolsep}{3pt}
-			\begin{tabular}{l|ccccccccccccccc}
-				$d(j,i)$ &       &       & \textbf{D} &       & \textbf{i} &       & \textbf{s} &       & \textbf{t} &       & \textbf{a} &       & \textbf{n} &       & \textbf{z} \\ \hline \\
-				& 0     & $\rightarrow$ & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6     & $\rightarrow$ & 7 \\
-				& $\downarrow$ & \alert<3->{$\searrow$} &       &       &       &       &       &       &       &       &       &       &       &       &  \\
-				\textbf{D}     & 1     &       & 0     & $\rightarrow$ & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6 \\
-				& $\downarrow$ &       & $\downarrow$ & \alert<3->{$\searrow$} &       &       &       &       &       &       &       &       &       &       &  \\
-				\textbf{i}     & 2     &       & 1     &       & 0     & $\rightarrow$ & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5 \\
-				& $\downarrow$ &       & $\downarrow$ &       & \alert<3->{$\downarrow$} & $\searrow$ &       & $\searrow$ &       & $\searrow$ &       & $\searrow$ &       &       &  \\
-				\textbf{n}     & 3     &       & 2     &       & 1     &       & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     &       & 3     & $\rightarrow$ & 4 \\
-				& $\downarrow$ &       & $\downarrow$ &       & $\downarrow$ & \alert<3->{$\searrow$} &       & $\searrow$ &       & $\searrow$ &       & $\searrow$ & $\downarrow$ & $\searrow$ &  \\
-				\textbf{s}     & 4     &       & 3     &       & 2     &       & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     &       & 4 \\
-				& $\downarrow$ &       & $\downarrow$ &       & $\downarrow$ &       & $\downarrow$ & \alert<3->{$\searrow$} &       &       &       &       &       &       &  \\
-				\textbf{t}     & 5     &       & 4     &       & 3     &       & 2     &       & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4 \\
-				& $\downarrow$ &       & $\downarrow$ &       & $\downarrow$ &       & $\downarrow$ &       & $\downarrow$ & \alert<3->{$\searrow$} &       &       &       &       &  \\
-				\textbf{a}     & 6     &       & 5     &       & 4     &       & 3     &       & 2     &       & 1     & \alert<3-3>{$\rightarrow$} & 2     & $\rightarrow$ & 3 \\
-				& $\downarrow$ &       & $\downarrow$ &       & $\downarrow$ & $\searrow$ & $\downarrow$ &       & $\downarrow$ &       & $\downarrow$ & \alert<4->{$\searrow$} &       & \alert<3-3>{$\searrow$} &  \\
-				\textbf{s}     & 7     &       & 6     &       & 5     &       & 4     &       & 3     &       & 2     &       & 2     & \alert<4->{$\rightarrow$} & 3 \\
-			\end{tabular}
-		
-		\pause
-		\begin{equation*}
-			d(\text{Dinstas}, \text{Distanz}) = 3
-		\end{equation*}
-\end{frame}
-
-\begin{frame} \frametitle{Aufgabe 9.4}
-	Alignments mit minimaler Levenshtein-Distanz:
-	
-	\centering
-	
-	\begin{tabular}{cccccccc}
-		D & i & n & s & t & a & $\ast$ & s \\
-		$|$ & $|$ & $|$ & $|$ & $|$ & $|$ & $|$ & $|$ \\
-		D & i & $\ast$ & s & t & a & n & z \\
-		  &   & \textit{d} &   &   &   & \textit{i} & \textit{s} \\
-	\end{tabular}
-
-	\vspace{3em}
-	
-	\begin{tabular}{cccccccc}
-		D & i & n & s & t & a & s & $\ast$ \\
-		$|$ & $|$ & $|$ & $|$ & $|$ & $|$ & $|$ & $|$ \\
-		D & i & $\ast$ & s & t & a & n & z \\
-		&   & \textit{d} &   &   &   & \textit{s} & \textit{i} \\
-	\end{tabular}
-\end{frame}
-
-\begin{frame} \frametitle{Aufgabe 2}
-	\centering
-	\renewcommand*{\arraystretch}{.7}
-	\setlength{\tabcolsep}{3pt}
-	\begin{tabular}{l|rrrrrrrlrrrlrlr}
-		$d(j,i)$ &       &       & \textbf{s} &       & \textbf{c} &       & \textbf{h} &       & \textbf{ü} &       & \textbf{r} &       & \textbf{z} &       & \textbf{e} \\ \hline \\
-		& 0     & \alert<3->{$\rightarrow$} & 1     & \alert<3->{$\rightarrow$} & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6     & $\rightarrow$ & 7 \\
-		& $\downarrow$ & \alert<4->{$\searrow$} &       & \alert<4->{$\searrow$} &       & \alert<3->{$\searrow$} &       & $\searrow$ &       & $\searrow$ &       & $\searrow$ &       & $\searrow$ &  \\
-		\textbf{b}     & 1     &       & 1     & \alert<4->{$\rightarrow$} & 2     & \alert<4->{$\rightarrow$} & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6     & $\rightarrow$ & 7 \\
-		& $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ &       & $\searrow$ &       & \alert<3->{$\searrow$} &       &       &       &       &       &       &  \\
-		\textbf{ü}     & 2     &       & 2     &       & 2     & $\rightarrow$ & 3     &       & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6 \\
-		& $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ &       & $\searrow$ & $\downarrow$ & \alert<3->{$\searrow$} &       &       &       &       &  \\
-		\textbf{r}     & 3     &       & 3     &       & 3     &       & 3     & $\rightarrow$ & 4     &       & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5 \\
-		& $\downarrow$ & $\searrow$ &       & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ &       &       & \alert<4->{$\downarrow$} & \alert<3->{$\searrow$} &       & $\searrow$ &  \\
-		\textbf{s}     & 4     &       & 3     & $\rightarrow$ & 4     &       & 4     &       & 4     &       & 4     &       & 4     & $\rightarrow$ & 5 \\
-		& $\downarrow$ &       & $\downarrow$ & $\searrow$ &       & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & \alert<4->{$\searrow$} & \alert<3->{$\downarrow$} & $\searrow$ &  \\
-		\textbf{t}     & 5     &       & 4     &       & 4     & $\rightarrow$ & 5     &       & 5     &       & 5     &       & 5     &       & 5 \\
-		& $\downarrow$ &       & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ &       & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & \alert<3->{$\searrow$} &  \\
-		\textbf{e}     & 6     &       & 5     &       & 5     &       & 5     & $\rightarrow$ & 6     &       & 6     & & 6     &  & 5 \\
-	\end{tabular}%
-
-	\pause
-
-	\begin{equation*}
-		d(\text{bürste}, \text{schürze}) = 5 \qquad \pause \pause \pause \text{Anzahl der Backtraces } = 3 * 2 = 6
-	\end{equation*}
-\end{frame}
-
-\begin{frame} \frametitle{Aufgabe 2 --- Teil (b)}
-	Alignments mit minimaler Levenshtein-Distanz zwischen den Wörtern
-	\texttt{bürst} und \texttt{sch}
-	
-	\centering
-	\renewcommand*{\arraystretch}{.7}
-	\setlength{\tabcolsep}{3pt}
-	\begin{tabular}{l|ccccccc}
-		$d(j,i)$ &       &       & \textbf{s} &       & \textbf{c} &       & \textbf{h}  \\ \hline \\
-		& 0     & $\rightarrow$ & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3  \\
-		& \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} &       & $\searrow$ &       & $\searrow$ &  \\
-		\textbf{b}     & 1     &       & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3  \\
-		& \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} & \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} &       & $\searrow$ &   \\
-		\textbf{ü}     & 2     &       & 2     &       & 2     & $\rightarrow$ & 3  \\
-		& \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} & \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} & \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} & \\
-		\textbf{r}     & 3     &       & 3     &       & 3     &       & 3 \\
-		& $\downarrow$ & \alert<2->{$\searrow$} &       & \alert<2->{$\searrow$} & \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} & \alert<2->{$\downarrow$}  \\
-		\textbf{s}     & 4     &       & 3     & \alert<2->{$\rightarrow$} & 4     &       & 4  \\
-		& $\downarrow$ &       & $\downarrow$ & \alert<2->{$\searrow$} &       & \alert<2->{$\searrow$} & \alert<2->{$\downarrow$} \\
-		\textbf{t}     & 5     &       & 4     &       & 4     & \alert<2->{$\rightarrow$} & 5   \\
-	\end{tabular}%
-\end{frame}
-
-\begin{frame} \frametitle{Aufgabe 2 --- Teil (b)}
-	Alignments mit minimaler Levenshtein-Distanz zwischen den Wörtern
-	\texttt{bürst} und \texttt{sch}
-	
-	\centering
-	\begin{tabular}{ccccc}
-		b & ü & r & s & t \\
-		$|$ & $|$ & $|$ & $|$ & $|$ \\
-		s & c & h & $\ast$ & $\ast$ \\
-		\textit{s} & \textit{s} & \textit{s} & \textit{d} & \textit{d}  \\
-	\end{tabular}
-	\hspace{2em}
-	\begin{tabular}{ccccc}
-		b & ü & r & s & t \\
-		$|$ & $|$ & $|$ & $|$ & $|$ \\
-		$\ast$ & $\ast$ & s & c & h \\
-		\textit{d} & \textit{d} & \textit{s} & \textit{s} & \textit{s}  \\
-	\end{tabular}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{AVL-Bäume}
 
@@ -346,12 +111,13 @@
 	\begin{itemize}
 		\item Einfügen eines neuen Schlüssels $s$
 		\item Berechne Balancefaktoren auf dem Pfad von $s$ zur Wurzel bis zum ersten Auftreten von $\pm 2$
+		\pause
 		\item \textbf{Balancierungsalgorithmus}: 
 		\includegraphics[width=\linewidth]{./tut10_avl.jpg}
 	\end{itemize}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 3}
+\begin{frame} \frametitle{Aufgabe 1}
 	\begin{tabularx}{\linewidth}{m{2cm} m{.8cm} m{2cm} m{.8cm} m{2cm}}
 		\begin{forest}
 			[ $2$ [ $1$ ] [$3$ [,no edge, draw=none] [ $4$ ]  ] ] 
@@ -371,7 +137,7 @@
 	\end{tabularx}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 3}
+\begin{frame} \frametitle{Aufgabe 1}
 	\centering
 	\begin{tabularx}{\linewidth}{m{2cm} m{.8cm} m{4cm}}
 		\begin{forest}
@@ -386,9 +152,9 @@
 	\end{tabularx}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 3}
+\begin{frame} \frametitle{Aufgabe 1}
 	\footnotesize
-	\begin{tabularx}{\linewidth}{m{2.8cm} m{.5cm} m{2.8cm}}
+	\begin{tabularx}{\linewidth}{m{4cm} m{.5cm} m{2.8cm}}
 		\begin{forest}
 			[ $8$ [ $5$ [ $3$ [ $2$ ] [ $4$ ]] [ $7$ [ $6$ ] [,no edge, draw=none]  ] ] [ $10$ [ $9$ ] [ $11$ ] ] ]
 		\end{forest}
@@ -408,7 +174,7 @@
 	\end{tabularx}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 3}
+\begin{frame} \frametitle{Aufgabe 1}
 	\small
 	\begin{tabularx}{\linewidth}{m{2cm} m{.5cm} m{2.5cm} m{.5cm} m{2cm}}
 		\begin{forest}
@@ -431,6 +197,77 @@
 		\begin{forest}
 			[ $4$ [ $2$ [ $1$ ] [ $3$ ]] [ $5$ [,no edge, draw=none] [ $6$ ] ] ]
 		\end{forest}
-	\end{tabularx}\end{frame}
+	\end{tabularx}
+\end{frame}
+
+
+\section{Topologisches Sortieren}
+
+\begin{frame} \frametitle{Topologisches Sortieren}
+	\begin{itemize}
+		\item Sortierung von \textit{Beziehungen} zwischen Objekten
+		\item \textbf{Bsp.:} Ablauf eines Bauvorhabens \pause
+		\begin{itemize}
+			\item Baugrube ausheben (1) vor Fundament gießen (2)
+			\item Fundament gießen (2) vor Wände setzen (3)
+			\item $\dots$
+			\item Elektrik im Bad (4) vor Fliesen (5)
+			\item Wohnzimmer tapezieren (6) vor streichen (7)
+			\item Wände streichen (5) und Fliesen (7) vor Möbel aufstellen (8)
+		\end{itemize}
+		\pause
+		\begin{center}
+			\includegraphics[width=0.7\linewidth]{tut10-topsort-bsp}
+		\end{center}
+		\pause
+		\item In welcher Reihenfolge kann ich die Tätigkeiten abarbeiten?
+	\end{itemize}
+\end{frame}
+
+\begin{frame} \frametitle{Topologisches Sortieren}
+	\small
+	Gegeben sei ein gerichteter, azyklischer Graph $G = (V,E)$. Eine \textbf{topologische Sortierung} von $G$ ist eine \textit{bijektive} Abbildung $\operatorname{ord} \colon V \to \menge{1, \dots, \card{V}}$, sodass für alle $v, v' \in V$ mit $(v,v') \in E$ die Relation
+	$\operatorname{ord}(v) < \operatorname{ord}(v')$ gilt.
+	
+	\pause
+	
+	\textbf{Algorithmus:}
+	
+	\texttt{while} ( Elemente übrig ) \\
+	\{  %\vspace{-\baselineskip}
+		\begin{itemize}
+			\item wähle Element $v$ ohne Vorgänger
+			\item dekrementiere Anzahl der Vorgänger in den Nachfolgern von $v$
+			\item füge $v$ der Ausgabeliste hinzu
+			\item lösche $v$ aus $G$
+		\end{itemize}
+	\}
+	 
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 2}
+	\textbf{Teil (a)}
+	\begin{center}
+		\includegraphics[width=0.5\linewidth]{tut10-aufgabe2a}
+	\end{center}
+	\pause
+	Es gibt $4! \cdot 1! \cdot 3! = 24 \cdot 1 \cdot 6 = 144$ viele topologische Sortierungen.
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 2}
+	\textbf{Teil (b)}
+	
+	Es werden alle Möglichkeiten mit der $1$ am Anfang gestrichen, d.h. im ersten Block gibt es nur noch $4! - 3! = 24 - 6$ viele Möglichkeiten --- insgesamt also 
+	\begin{equation*}
+		(4! - 3!) \cdot 1! \cdot 3! = 18 \cdot 1 \cdot 6 = 108 \, .
+	\end{equation*}
+
+	\pause
+	
+	\textbf{Teil (c)}
+	\begin{center}
+		\includegraphics[width=0.7\linewidth]{tut10-aufgabe2c}
+	\end{center}
+\end{frame}
 
 \end{document}
