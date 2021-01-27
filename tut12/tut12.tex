@@ -228,11 +228,12 @@
 
 	\hspace{1em} \pause
 	
-	Update-Formel: $D_G^{(k+1)}(u,v)$
+	Update-Formel: 
 	\begin{equation*}
 	\small
 	\setlength{\arraycolsep}{1pt}
 		\begin{array}{rccrcccccr}
+			\mathrlap{D_G^{(k+1)}(u,v)}\\
 			=& D_G^{(k)}(u,v) &\oplus& \Big( & D_G^{(k)}(u,k+1) &\odot& (D_G^{(k)}(k+1,k+1))^\ast &\odot& D_G^{(k)}(k+1,v) & \Big) \\
 			=& D_G^{(k)}(u,v) &\cup& \Big( & D_G^{(k)}(u,k+1) &\circ& \alert{(D_G^{(k)}(k+1,k+1))^\ast} &\circ& D_G^{(k)}(k+1,v) & \Big) \\
 			=& \text{alt} &\cup& \Big(& \text{Zeile} &\circ& \alert{(\text{Diagonale})^\ast} &\circ& \text{Spalte} & \Big)
