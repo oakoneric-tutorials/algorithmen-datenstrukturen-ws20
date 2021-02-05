@@ -155,6 +155,9 @@ version={4.0},
 \DeclareMathOperator{\nowin}{kein Gewinn}
 \DeclareMathOperator{\rfe}{rfe}
 
+\newcommand{\satzende}{\enskip \text{.}}
+\newcommand{\komma}{\enskip \text{,}}
+
 \newlength{\labellength}
 \settowidth{\labellength}{(a)}
 %\addtolength{\labellength}{1em}
@@ -176,7 +179,7 @@ version={4.0},
 	\section*{Aufgabe 1}
 	Wir betrachten den Wurf zweier Münzen, wobei die erste Münze auch auf dem Rand landen kann. Dementsprechend gibt es für die erste Münze die Möglichkeiten $\menge{K,Z,R}$, für die zweite \enquote{normale} Münze nur die Möglichkeiten $\menge{K,Z}$. Insgesamt gibt es also die Möglichkeiten
 	\begin{equation*}
-	X \defeq \menge{K,Z,R} \times \menge{K,Z} = \menge{(K,K), (K,Z), (Z,K), (Z,Z), (R,K), (R,Z)}
+	X \defeq \menge{K,Z,R} \times \menge{K,Z} = \menge{(K,K), (K,Z), (Z,K), (Z,Z), (R,K), (R,Z)} \satzende
 	\end{equation*}
 	Wir gewinnen ein Spiel, wenn beide Münzen gleich landen.
 	
@@ -189,14 +192,14 @@ version={4.0},
 	eingeführt, die jedem Ergebnis der Ergebnismenge eine Beobachtung zuordnet, d.h. ob man bei einem Ergebnis gewinnt oder nicht. Beispielsweise ist $\yield(K,K) = \win$ aber $\yield(R,Z) = \nowin$.
 	Da wird nun aber nicht den konkreten Ausgang des Spiels erfahren, sondern nur die Beobachtung, ob gewonnen wurde oder nicht, benötigen wir alle Ergebnisse, die zu dieser Beobachtung geführt haben könnten. Das wird mathematisch gesehen das Urbild einer Beobachtung unter der $\yield$-Abbildung. Dieses definiert uns eine neue Abbildung 
 	\begin{equation*}
-		\abb{A}{\menge{\win, \nowin}}{\pows{X}}
+		\abb{A}{\menge{\win, \nowin}}{\pows{X}} \komma
 	\end{equation*} 
 	die wir \begriff{Analysator} nennen. Der Analysator liefert also für eine gegebene Beobachtung die Menge der zugehörigen Ergebnisse.
 	Somit ist also
 	\begin{equation*}
 		\begin{aligned}
-		A(\win) &= \menge{x \in X: \yield(x) = \win} = \menge{(K,K), (Z,Z)} \\
-		A(\nowin) &= \menge{x \in X: \yield(x) = \nowin} = \menge{(K,Z), (Z,K),(R,K),(R,Z)}
+		A(\win) &= \menge{x \in X: \yield(x) = \win} = \menge{(K,K), (Z,Z)} \komma\\
+		A(\nowin) &= \menge{x \in X: \yield(x) = \nowin} = \menge{(K,Z), (Z,K),(R,K),(R,Z)} \satzende
 		\end{aligned}
 	\end{equation*}
 	
@@ -213,14 +216,14 @@ version={4.0},
 	\item 
 	Gegeben ist nun eine initiale Wahrscheinlichkeitsverteilung $q_0 = q_0^1 \times q_0^2$ über den vollständigen Daten mit
 	\begin{align*}
-		q_0^1(K) &= \frac{2}{5} & q_0^2(K) &= \frac{1}{3} \\
-		q_0^1(R) &= \frac{1}{5} 
+		q_0^1(K) &= \frac{2}{5} \komma & q_0^2(K) &= \frac{1}{3} \komma \\
+		q_0^1(R) &= \frac{1}{5}  \satzende
 	\end{align*}
 	Diese Verteilung können wir nun noch ergänzen, da sich die Wahrscheinlichkeiten zu $1$ aufaddieren müssen. Somit ist also
 	\begin{equation*} 
 		\begin{aligned}
-			q_0^1(K) + q_0^1(R) + q_0^1(Z) = 1 &\follows q_0^1(Z) = 1 - q_0^1(K) - q_0^1(R) = 1 - \frac{2}{5} - \frac{1}{5} = \frac{2}{5} \\
-			q_0^2(K) + q_0^2(Z) = 1 &\follows q_0^2(Z) = 1 - q_0^1(K) = 1 - \frac{1}{3} = \frac{2}{3}
+			q_0^1(K) + q_0^1(R) + q_0^1(Z) = 1 &\follows q_0^1(Z) = 1 - q_0^1(K) - q_0^1(R) = 1 - \frac{2}{5} - \frac{1}{5} = \frac{2}{5} \komma \\
+			q_0^2(K) + q_0^2(Z) = 1 &\follows q_0^2(Z) = 1 - q_0^1(K) = 1 - \frac{1}{3} = \frac{2}{3} \satzende 
 		\end{aligned}
 	\end{equation*}
 	Nun können wir das unabhängige Produkt nutzen. Dieses ist ungefähr das, was man aus der Schule als Pfadregel kennt, wo man entlang eines Pfades multipliziert.
@@ -237,14 +240,15 @@ version={4.0},
 	Im E-Schritt des EM-Algorithmus muss nun der Korpus $h$ zu einem Korpus $h_1$ erweitert werden. Dies geschieht mit folgender Formel:
 	\begin{equation*}
 		h_1(x) = h(\yield(x)) * \frac{q_0(x)}{\sum\limits_{x' \in A(\yield(x))} q_0(x')}
+		\satzende
 	\end{equation*}
 	Das sieht jetzt zwar kompliziert aus, aber lässt sich relativ einfach vereinfachen bzw. einfacher lesen. Der Summationsbereich $A(\yield(x))$ besteht genau aus den Elementen, die die gleiche Beobachtung haben wie $x$, also zum Beispiel
 	\begin{equation*}
-		A(\yield(K,K)) = A(\win) = \menge{(K,K), (Z,Z)}
+		A(\yield(K,K)) = A(\win) = \menge{(K,K), (Z,Z)} \satzende
 	\end{equation*}
 	Der Vorfaktor $h(\yield(x))$ lässt sich auch relativ leicht berechnen, wir nehmen einfach die Beobachtung von $x$ und deren Korpus, d.h. zum Beispiel
 	\begin{equation*}
-		h(\yield(K,K)) = h(\win) = 6
+		h(\yield(K,K)) = h(\win) = 6 \satzende
 	\end{equation*}
 	Damit ergibt sich dann
 	\begin{align*}
@@ -252,12 +256,12 @@ version={4.0},
 		&= h(\win) * \frac{q_0(K,K)}{\sum\limits_{x' \in \menge{(K,K),(Z,Z)}} q_0(x')} \\
 		&= h(\win) * \frac{q_0(K,K)}{q_0(K,K) + q_0(Z,Z)} \\
 		&= 6 * \frac{\frac{2}{15}}{\frac{2}{15} + \frac{4}{15}} \\
-		&= 2
+		&= 2 \satzende
 	\end{align*}
 	Mit gleicher Rechnung erhält man für die restlichen Ereignisse
 	\begin{align*}
-		h_1(K,Z) &= 8 & h_1(Z,K) &= 4 & h_1(R,K) &= 2 \\
-				 &    & h_1(Z,Z) &= 4 & h_1(R,Z) &= 4
+		h_1(K,Z) &= 8 \komma & h_1(Z,K) &= 4 \komma & h_1(R,K) &= 2 \komma \\
+				 &    & h_1(Z,Z) &= 4 \komma & h_1(R,Z) &= 4 \satzende
 	\end{align*}
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -270,10 +274,11 @@ version={4.0},
 		= h_1(K,K) + h_1(K,Z)
 		= 2 + 8
 		= 10
+		\satzende
 	\end{equation*}
 	Effektiv addiert man also die Korpora, wo $K$ in der \textit{ersten} Komponenten vorkommt. Schließlich erhält man $h_1^1$ vollständig mit
 	\begin{equation*}
-		h_1^1(K) = 10 \qquad h_1^1(Z) = 8 \qquad h_1^1(R) = 6
+		h_1^1(K) = 10 \komma \qquad h_1^1(Z) = 8 \komma \qquad h_1^1(R) = 6 \satzende
 	\end{equation*}
 	Für $h_1^2$ erhält man
 	\begin{equation*}
@@ -283,12 +288,12 @@ version={4.0},
 		&=& \sum\limits_{x \in \menge{K,Z,R}} h_1(x,K) 
 		&=& h_1(K,K) + h_1(Z,K) + h_1(R,K)
 		&=& 2 + 4 + 2
-		&=& 8 \\
+		&=& 8 \komma \\
 		h_1^2(Z)
 		&=& \sum\limits_{x \in \menge{K,Z,R}} h_1(x,Z)
 		&=& h_1(K,Z) + h_1(Z,Z) + h_1(R,Z)
 		&=& 8 + 4 + 4
-		&=& 16
+		&=& 16 \komma
 	\end{array}
 	\end{equation*}
 	wobei man wiederum die Korpora addiert, wo $K$ in der \textit{zweiten} Komponenten vorkommt.
@@ -319,16 +324,16 @@ version={4.0},
 	\item 
 	Nun bestimmen wir noch die relativen Häufigkeiten mit der Formel
 	\begin{equation*}
-		\rfe(h)(x) \defeq \frac{h(x)}{\abs{h}} \quad \mit \quad \abs{h} \defeq \sum_{x \in X} h(x)
+		\rfe(h)(x) \defeq \frac{h(x)}{\abs{h}} \quad \mit \quad \abs{h} \defeq \sum_{x \in X} h(x) \satzende
 	\end{equation*}
 	Wenden wir dies nun auf $h_1$ und $h_2$ an, so erhalten wir
 	\begin{align*}
-		q_1^1(K) = \rfe(h_1^1)(K) &= \frac{h_1^1(K)}{h_1^1(K) + h_1^1(Z) + h_1^1(R)} = \frac{10}{24} = \frac{5}{12} \\
-		q_1^1(Z) = \rfe(h_1^1)(Z) &= \frac{h_1^1(Z)}{h_1(K) + h_1^1(Z) + h_1^1(R)} = \frac{8}{24} = \frac{1}{3} \\
+		q_1^1(K) = \rfe(h_1^1)(K) &= \frac{h_1^1(K)}{h_1^1(K) + h_1^1(Z) + h_1^1(R)} = \frac{10}{24} = \frac{5}{12} \komma \\
+		q_1^1(Z) = \rfe(h_1^1)(Z) &= \frac{h_1^1(Z)}{h_1(K) + h_1^1(Z) + h_1^1(R)} = \frac{8}{24} = \frac{1}{3} \komma \\
 		q_1^1(R) = \rfe(h_1^1)(R) &= \frac{h_1^1(R)}{h_1^1(K) + h_1^1(Z) + h_1^1(R)} = \frac{6}{24} = \frac{1}{4} \\
 		\intertext{und}
-		q_1^2(K) = \rfe(h_1^2)(K) &= \frac{h_1^2(K)}{h_1^2(K) + h_1^2(Z)} = \frac{8}{24} = \frac{1}{3} \\
-		q_1^2(Z) = \rfe(h_1^2)(Z) &= \frac{h_1^2(Z)}{h_1^2(K) + h_1^2(Z)} = \frac{16}{24} = \frac{2}{3} \\
+		q_1^2(K) = \rfe(h_1^2)(K) &= \frac{h_1^2(K)}{h_1^2(K) + h_1^2(Z)} = \frac{8}{24} = \frac{1}{3} \komma \\
+		q_1^2(Z) = \rfe(h_1^2)(Z) &= \frac{h_1^2(Z)}{h_1^2(K) + h_1^2(Z)} = \frac{16}{24} = \frac{2}{3} \satzende\\
 	\end{align*}
 \end{enumerate}	
 		
@@ -345,14 +350,14 @@ version={4.0},
 		\end{align*}
 		\item Der Korpus mit unvollständigen Daten ist gegeben durch
 		\begin{align*}
-			h(\text{\enquote{A gewinnt}}) &= 21 \\
-			h(\text{\enquote{B gewinnt}}) &= 10
+			h(\text{\enquote{A gewinnt}}) &= 21 \komma \\
+			h(\text{\enquote{B gewinnt}}) &= 10 \satzende
  		\end{align*}
  		\item Gegeben ist eine initiale Wahrscheinlichkeitsverteilung $q_0 = q_0^M \times q_0^W$. Wir vervollständigen zuerst die Angaben von $q_0^M$ und $q_0^W$:
  		\begin{align*}
- 			q_0^M(1) &= \frac{1}{3} & q_0^W(1) = \frac{1}{4} \\
- 			q_0^M(2) &= \frac{2}{3} & q_0^W(2) = \frac{1}{2} \\
- 			 		 &              & q_0^W(3) = \frac{1}{4} 
+ 			q_0^M(1) &= \frac{1}{3} \komma & q_0^W(1) = \frac{1}{4} \komma \\
+ 			q_0^M(2) &= \frac{2}{3} \komma & q_0^W(2) = \frac{1}{2} \komma \\
+ 			 		 &                     & q_0^W(3) = \frac{1}{4} \satzende 
  		\end{align*}
  		Nun können wir $q_0$ als unabhängiges Produkt berechnen:
  		\begin{align*}
@@ -365,9 +370,9 @@ version={4.0},
  		\end{align*}
  		\item Wir führen den E-Schritt aus und Vervollständigen den Korpus $h$ zu einem Korpus $h_1$:
  		\begin{align*}
- 			h_1(1,1) &= 3 & h_1(2,1) &= 6 \\
- 			h_1(1,2) &= 4 & h_1(2,2) &= 12 \\
- 			h_1(1,3) &= 2 & h_1(2,3) &= 4
+ 			h_1(1,1) &= 3 \komma & h_1(2,1) &= 6  \komma \\
+ 			h_1(1,2) &= 4 \komma & h_1(2,2) &= 12 \komma \\
+ 			h_1(1,3) &= 2 \komma & h_1(2,3) &= 4  \satzende
  		\end{align*}
  		\item M-Schritt --- Wir bestimmen zuerst die Teilkorpora $h_1^M$ und $h_1^W$ durch Marginalisierung:
  		\begin{equation*}
@@ -389,12 +394,12 @@ version={4.0},
  		\end{equation*}
  		\item Wir schätzen nun die Wahrscheinlichkeitsverteilung $q_1^M$ und $q_1^W$ als relative Häufigkeit der Teilkorpora.
  		\begin{align*}
- 		q_1^W(1) = \rfe(h_1^W)(1) &= \frac{h_1^W(1)}{h_1^W(1) + h_1^W(2) + h_1^W(3)} = \frac{9}{31} \\
- 		q_1^W(2) = \rfe(h_1^W)(2) &= \frac{h_1^W(1)}{h_1^W(1) + h_1^W(2) + h_1^W(3)} = \frac{16}{31} \\
+ 		q_1^W(1) = \rfe(h_1^W)(1) &= \frac{h_1^W(1)}{h_1^W(1) + h_1^W(2) + h_1^W(3)} = \frac{9}{31} \komma \\
+ 		q_1^W(2) = \rfe(h_1^W)(2) &= \frac{h_1^W(1)}{h_1^W(1) + h_1^W(2) + h_1^W(3)} = \frac{16}{31} \komma \\
  		q_1^W(3) = \rfe(h_1^W)(3) &= \frac{h_1^W(1)}{h_1^W(1) + h_1^W(2) + h_1^W(3)} = \frac{6}{31} \\
  		\intertext{und}
- 		q_1^M(1) = \rfe(h_1^M)(1) &= \frac{h_1^M(1)}{h_1^M(1) + h_1^M(2)} = \frac{9}{31} \\
- 		q_1^M(2) = \rfe(h_1^M)(2) &= \frac{h_1^M(2)}{h_1^M(1) + h_1^M(2)} = \frac{22}{31} \\
+ 		q_1^M(1) = \rfe(h_1^M)(1) &= \frac{h_1^M(1)}{h_1^M(1) + h_1^M(2)} = \frac{9}{31} \komma \\
+ 		q_1^M(2) = \rfe(h_1^M)(2) &= \frac{h_1^M(2)}{h_1^M(1) + h_1^M(2)} = \frac{22}{31} \satzende \\
  		\end{align*}
 	\end{enumerate}
 \end{document}
